@@ -1,0 +1,32 @@
+#created on: 29-Aug-2008
+package ndfdf
+
+#list any import classes here.
+
+
+
+#declare any global variables here
+
+function myFunction( ... ) 
+    #function content (can have multiple functions) 
+end
+
+
+
+rule "Your First Rule"
+	
+	when
+		#conditions
+	then 
+		#actions
+		
+end
+
+rule "Your Second Rule"
+	#include attributes such as "salience" here...
+	when
+		#conditions
+	then 
+		#actions
+		
+end

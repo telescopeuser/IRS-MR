@@ -1,0 +1,126 @@
+/**
+ * Chap 6 /7 sample 
+ * 
+ * (c) Paul Browne, FirstPartners.net 
+ * Contains sample code from FIT and Drools
+ * Chap 6/7/ available under the GPL
+ */
+package net.firstpartners.chap6;
+
+import java.util.Date;
+
+import net.firstpartners.drools.log.ILogger;
+
+import net.firstpartners.chap11.domain.CustomerOrder;
+import net.firstpartners.chap11.domain.ChocolateShipment;
+import net.firstpartners.chap11.domain.OoompaLoompaDate;
+
+global OoompaLoompaDate nextAvailableShipmentDate;
+global ILogger log;
+
+
+rule "confirm holidays" 
+
+	when
+		$holiday : OoompaLoompaDate()
+       
+    then
+        	   
+        //Logging message
+    	log.info("Remember - Ooompa Loompas don't work on:"+$holiday);
+
+end
+
+
+rule "Chocolate Shipment"   
+    when
+        $CustomerOrder : CustomerOrder(currentBalance>0)
+       
+    then
+        
+        //Add a new shipment into the CustomerOrder
+        ChocolateShipment ChocolateShipment = new ChocolateShipment(210);
+    	modify($CustomerOrder){
+        	addShipment(ChocolateShipment)
+        }
+        
+        //notify the working memory of the new shipment
+        insert( ChocolateShipment );
+        
+        //Logging message
+        log.info("Fired Customer Shipment rule - customer is still waiting for "+$CustomerOrder.getCurrentBalance()+" chocolate bars");
+        
+end
+
+
+
+rule "Add Next Available Shipment Date"
+
+    when
+        $ChocolateShipment : ChocolateShipment(shipmentDate ==null)
+       
+    then
+        
+        
+        modify($ChocolateShipment){
+        	setShipmentDate(nextAvailableShipmentDate.getCopy())
+        }
+        	
+        nextAvailableShipmentDate.rollForward(7);
+
+
+       //Logging message
+    	log.info("Add Next Available Shipment Date:"+$ChocolateShipment.getShipmentDate());
+end
+
+
+rule "modify due to holidays" 
+
+	when
+		$holiday : OoompaLoompaDate()
+        $ChocolateShipment : ChocolateShipment(shipmentDate==$holiday)
+       
+    then
+        
+         modify($ChocolateShipment){
+        	getShipmentDate().rollForward(1)
+        }
+        	   
+        //Logging message
+    	log.info("Reschedule Shipment Date to:"+$ChocolateShipment.getShipmentDate()+" due to holiday on:"+$holiday);
+
+end
+
+
+rule "Don't ship more than the customer order"   
+    when
+        $CustomerOrder : CustomerOrder(currentBalance<0)
+        $ChocolateShipment : ChocolateShipment(itemsStillToShip<0)
+       
+    then
+    
+    	
+    	long $newShipment = $ChocolateShipment.getShipmentAmount()+$ChocolateShipment.getItemsStillToShip();
+    
+    
+         modify($ChocolateShipment){
+        	setShipmentAmount($newShipment),
+        	setItemsStillToShip(0)
+        }
+        
+    
+        modify($CustomerOrder){
+        	setCurrentBalance(0)
+        }
+     
+        
+        //Logging message
+        log.info("Removed CustomerOrder Overshipping - new shipment:"+$newShipment);
+        
+end
+
+
+
+
+
+	

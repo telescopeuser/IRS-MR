@@ -1,0 +1,70 @@
+package net.firstpartners.chap9;
+
+import net.firstpartners.drools.log.ILogger
+
+import net.firstpartners.excel.Cell;
+import net.firstpartners.excel.Range;
+
+global ILogger log;
+
+rule "log then modify cell values" 
+
+	when
+		$cell : Cell()
+    then
+    	 //Logging message
+    	log.info("initial cell value:"+$cell);
+end
+
+
+rule "Evaluate and accept all buy trades"
+	ruleflow-group "Buy"
+	when
+		$r:Range()
+//		eval($r.getCell(1)!=null)
+//		eval($r.getCell(1).getBooleanValue()==true)
+		
+	then
+		$r.getCell(4).setValue("Buy This");
+		log.info("Plan to Buy from Broker");
+		update($r.getCell(4));
+		update($r);
+end
+/*
+
+rule "Execute the Buy Trades"
+	ruleflow-group "Buy"
+	when
+		$r:Range(eval($r.getRangeContainsValue("Buy This")))
+		$output:Range(eval($output.getRangeName().equals("Current_Stock")))
+	then
+		$output.getCell(1).setValue($output.getCell(1).getIntValue()+$r.getCell(2).getIntValue());
+		$r.getCell(4).setValue("Trade Executed (Buy)");
+		log.info("Executed Trade");
+end
+
+rule "Evaluate and accept all sell trades"
+	ruleflow-group "Sell"
+	when
+		$r:Range(eval($r.getCell(1).getBooleanValue()==false))
+	then
+		$r.getCell(4).setValue("Buy This");
+		log.info("Plan to Buy from Broker");
+		update($r.getCell(4));
+		update($r);
+end
+
+
+rule "Execute the Sell Trades"
+	ruleflow-group "Sell"
+	when
+		$r:Range(eval($r.getRangeContainsValue("Sell This")))
+		$output:Range(eval($output.getRangeName().equals("Current_Stock")))
+	then
+		$output.getCell(1).setValue($output.getCell(1).getIntValue()-$r.getCell(2).getIntValue());
+		$r.getCell(4).setValue("Trade Executed(Sell)");
+		log.info("Executed Trade");
+end
+
+*/
+

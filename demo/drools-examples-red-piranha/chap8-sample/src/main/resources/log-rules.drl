@@ -1,0 +1,59 @@
+package net.firstpartners.chap8;
+
+
+
+import net.firstpartners.drools.log.ILogger
+
+import net.firstpartners.excel.Cell;
+import net.firstpartners.excel.Range;
+
+global ILogger log;
+
+
+
+rule "print cell initial values" 
+
+
+	when
+		$cell : Cell(modified==false)
+       
+    then
+        	   
+        //Logging message
+    	log.info("initial cell value:"+$cell);
+    	
+    	
+end
+
+
+
+rule "print cell modified values" 
+
+
+	when
+		$cell : Cell(modified==true)
+       
+    then
+        	   
+        //Logging message
+    	log.info("modified cell value:"+$cell);
+    	
+    	
+end
+
+
+/*
+#This rule is commented out - prints *lots* of information on our ranges if enabled
+
+rule "print range" 
+
+
+	when
+		$range : Range()
+       
+    then
+        	   
+        //Logging message
+    	log.info("rule:"+$range.toShortString());
+
+end*/
